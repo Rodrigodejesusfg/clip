@@ -1,11 +1,9 @@
 import streamlit as st
-import google.generativeai as genai
 import pandas as pd
 from datetime import datetime
 import plotly.express as px
-from dotenv import load_dotenv
+import google.generativeai as genai
 
-load_dotenv()  # carrega as variáveis do arquivo .env
 
 genai.configure(api_key="APIKEY")
 
