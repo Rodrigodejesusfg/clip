@@ -3,4 +3,4 @@ google.generativeai
 pandas
 datetime
 plotly.express
-
+openpyxl
