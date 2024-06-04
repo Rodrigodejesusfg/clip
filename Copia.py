@@ -10,19 +10,17 @@ st.title("📰 Clip.Ai")
 # Cor personalizada
 COR_PERSONALIZADA = "#518CB7"
 
-# Carregar DataFrame com as notícias
 @st.cache_data
 def carregar_dados():
-    df = pd.read_excel("google_alerts2.xlsx")
-    df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d') # Formatando data durante o carregamento
+    df = pd.read_excel("google_alerts2.xlsx")  # Sem o caminho absoluto
+    df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
     return df
 
 df = carregar_dados()
 
-# Carregar dados da planilha 'analise_empresas'
 @st.cache_data
 def carregar_dados_empresas():
-    df_empresas = pd.read_excel("analise_empresas.xlsx")
+    df_empresas = pd.read_excel("analise_empresas.xlsx")  # Sem o caminho absoluto
     return df_empresas
 
 df_empresas = carregar_dados_empresas()
