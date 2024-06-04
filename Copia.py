@@ -13,7 +13,7 @@ COR_PERSONALIZADA = "#518CB7"
 # Carregar DataFrame com as notícias
 @st.cache_data
 def carregar_dados():
-    df = pd.read_excel("Google_alerts2.xlsx")
+    df = pd.read_excel("google_alerts2.xlsx")
     df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d') # Formatando data durante o carregamento
     return df
 
