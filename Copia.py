@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-
+import openpyxl
 # Configuração da página
 st.set_page_config(page_title="Barbosa.Ai", page_icon=":newspaper:")
 st.title("📰 Clip.Ai")
