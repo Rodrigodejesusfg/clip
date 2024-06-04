@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import plotly.express as px
 import google.generativeai as genai
+import plotly.express as px
+
 
 
 genai.configure(api_key="APIKEY")
