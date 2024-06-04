@@ -1,17 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-import google.generativeai as genai
-import plotly.express as px
 
-
-
-genai.configure(api_key="APIKEY")
-
-# Encontrar um modelo compatível 
-MODELO_NOME = "gemini-1.5-pro-latest"  
-
-model = genai.GenerativeModel(MODELO_NOME)
 
 # Configuração da página
 st.set_page_config(page_title="Barbosa.Ai", page_icon=":newspaper:")
@@ -36,19 +26,6 @@ def carregar_dados_empresas():
     return df_empresas
 
 df_empresas = carregar_dados_empresas()
-
-# Função para gerar o comentário
-def gerar_comentário(texto, instrucao):
-    """Gera um comentário personalizado usando o modelo Gemini Pro."""
-    prompt = (
-        f"Por favor, comece se apresentando com o nome: o Barbosa, "
-        f"forneça um comentário sobre o seguinte texto"
-        f"com foco em: {instrucao}\n\n"
-        f"Texto:\n{texto}\n\n"
-        f"Comentário:"
-    )
-    response = model.generate_content(prompt)
-    return response.text
 
 # Paleta de cores
 COR_FUNDO = "#FFFFFF"  # Branco
@@ -135,15 +112,6 @@ if opcao_selecionada == "Comentar Notícias":
                 """,
                 unsafe_allow_html=True,
             )
-
-            # Instrução para o resumo
-            instrucao_resumo = st.text_input(f"Instrução para o comentário da notícia {i + 1}:")
-
-            if st.button(f"Gerar comentário da Notícia {i + 1}"):
-                with st.spinner("Ok, estou lendo! Um segundo..."):
-                    comentario = gerar_comentário(noticia['Conteúdo'], instrucao_resumo)
-                    st.success("**Comentário:**")
-                    st.write(comentario)
 
 # --- Seção para Resumir por Tema e Data ---
 elif opcao_selecionada == "Resumir por Tema e Data":
@@ -250,116 +218,7 @@ elif opcao_selecionada == "Analisar Empresas":
             st.write("Nenhuma notícia encontrada para a empresa selecionada.")
 
        
-# --- Seção para Estatísticas ---
-elif opcao_selecionada == "Estatísticas":
-    st.sidebar.markdown("---")
-    st.sidebar.header("Filtrar datas")
 
-    with st.sidebar:
-        # Filtro deslizante de data
-        data_inicio, data_fim = st.slider(
-            "Selecione o intervalo de datas:",
-            min_value=datetime.strptime(df['Data'].min(), '%Y-%m-%d').date(),
-            max_value=datetime.strptime(df['Data'].max(), '%Y-%m-%d').date(),
-            value=(
-                datetime.strptime(df['Data'].min(), '%Y-%m-%d').date(),
-                datetime.strptime(df['Data'].max(), '%Y-%m-%d').date()
-            ),
-            format="DD/MM/YYYY"
-        )
-
-    # Aplicar filtro ao DataFrame
-    df_filtrado = df[(df['Data'] >= data_inicio.strftime('%Y-%m-%d')) &
-                     (df['Data'] <= data_fim.strftime('%Y-%m-%d'))]
-
-    # --- Conteúdo da Seção de Estatísticas ---
-    st.subheader("Estatísticas das Notícias")
-
-    # Gráfico 1: Quantidade de notícias por dia
-    st.subheader("Quantidade de notícias por dia")
-    noticias_por_dia = df_filtrado.groupby('Data').size().reset_index(name='Quantidade')
-    fig_noticias_dia = px.bar(
-        noticias_por_dia,
-        x='Data',
-        y='Quantidade',
-        color_discrete_sequence=[COR_PRIMARIA]
-    )
-    fig_noticias_dia.update_layout(
-        xaxis_title="Data",
-        yaxis_title="Quantidade de Notícias",
-        plot_bgcolor=COR_FUNDO,
-        paper_bgcolor=COR_FUNDO
-    )
-    st.plotly_chart(fig_noticias_dia)
-
-    # Gráfico 2: Contagem de Fontes
-    st.subheader("Contagem de Fontes")
-    contagem_fontes = df_filtrado['Fonte'].value_counts().reset_index()
-    contagem_fontes.columns = ['Fonte', 'Quantidade']
-    fig_fontes = px.bar(
-        contagem_fontes,
-        x='Fonte',
-        y='Quantidade',
-        color_discrete_sequence=[COR_SECUNDARIA]
-    )
-    fig_fontes.update_layout(
-        xaxis_title="Fonte",
-        yaxis_title="Quantidade",
-        plot_bgcolor=COR_FUNDO,
-        paper_bgcolor=COR_FUNDO
-    )
-    st.plotly_chart(fig_fontes)
-
-    # Gráfico 3: Gráfico de Pizza para Temas
-    st.subheader("Distribuição de Temas")
-    contagem_temas = df_filtrado['Tema'].value_counts()
-    fig_pizza_temas = px.pie(
-        contagem_temas,
-        values=contagem_temas.values,
-        names=contagem_temas.index,
-        color_discrete_sequence=[COR_PRIMARIA, COR_SECUNDARIA, COR_ACENTO, COR_TEXTO]
-    )
-    fig_pizza_temas.update_layout(
-        plot_bgcolor=COR_FUNDO,
-        paper_bgcolor=COR_FUNDO
-    )
-    st.plotly_chart(fig_pizza_temas)
-
-
-
-# --- Seção do Chatbot ---
-
-elif opcao_selecionada == "Chatbot":
-    st.subheader("Converse com o Barbosa")
-
-    # Armazenar o histórico da conversa
-    if "historico_conversa" not in st.session_state:
-        st.session_state.historico_conversa = []
-
-    # Exibir o histórico da conversa
-    for mensagem in st.session_state.historico_conversa:
-        if mensagem["usuario"]:
-            st.markdown(f"**Você:** {mensagem['texto']}")
-        else:
-            st.markdown(f"**Barbosa:** {mensagem['texto']}")
-
-    # Caixa de entrada para o usuário digitar
-    pergunta_usuario = st.text_input("Digite sua pergunta:")
-
-    # Botão para enviar a pergunta
-    if st.button("Enviar"):
-        if pergunta_usuario:
-            # Adicionar a pergunta do usuário ao histórico
-            st.session_state.historico_conversa.append({"usuario": True, "texto": pergunta_usuario})
-
-            # Gerar resposta do chatbot usando a base de conhecimento
-            resposta_chatbot = gerar_comentario(pergunta_usuario, "responder a pergunta", usar_conhecimento=True)
-
-            # Adicionar a resposta do chatbot ao histórico
-            st.session_state.historico_conversa.append({"usuario": False, "texto": resposta_chatbot})
-
-            # Recarregar a página para exibir a conversa atualizada
-            st.experimental_rerun()
             
 # In[ ]:
 
