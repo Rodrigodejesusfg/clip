@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()  # carrega as variáveis do arquivo .env
 
-genai.configure(api_key="AIzaSyCtj2xGASpn_FrNYW9D-Nbt_F8-CXpFypQ")
+genai.configure(api_key="APIKEY")
 
 # Encontrar um modelo compatível 
 MODELO_NOME = "gemini-1.5-pro-latest"  
