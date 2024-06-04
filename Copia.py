@@ -11,7 +11,7 @@ COR_PERSONALIZADA = "#518CB7"
 
 @st.cache_data
 def carregar_dados():
-    df = pd.read_excel("google_alerts2.xlsx)  # Sem o caminho absoluto
+    df = pd.read_excel("google_alerts2.xlsx")  # Sem o caminho absoluto
     df['Data'] = pd.to_datetime(df['Data']).dt.strftime('%Y-%m-%d')
     return df
 
